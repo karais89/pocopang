@@ -44,3 +44,6 @@ TagManager:
   - name: Background
     uniqueID: 481031111
     locked: 0
+  - name: Coin
+    uniqueID: 1684468181
+    locked: 0
