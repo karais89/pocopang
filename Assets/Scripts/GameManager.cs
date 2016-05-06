@@ -3,6 +3,7 @@
 using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using DG.Tweening;
 
 public class GameManager : MonoBehaviour
 {
@@ -78,6 +79,8 @@ public class GameManager : MonoBehaviour
         _touchSystem.GameManager = this;
 
         InitGameCoin();
+
+        DOTween.Init(false, true, LogBehaviour.ErrorsOnly);
     }
 
     private void InitGameCoin()
@@ -332,11 +335,30 @@ public class GameManager : MonoBehaviour
         // pos swap
         Vector2 tmpPos = tmpCoin2.transform.position;
         tmpCoin2.transform.position = tmpCoin1.transform.position;
-        tmpCoin1.transform.position = tmpPos;
+        //tmpCoin1.transform.position = tmpPos;
+
+        MoveCoin(tmpCoin1, tmpPos);
 
         // array swap
         GameCoin tmpCoin = _gameCoins[index1];
         _gameCoins[index1] = _gameCoins[index2];
         _gameCoins[index2] = tmpCoin;
+    }
+
+    public void MoveCoin(GameCoin coin, Vector2 pos)
+    {
+        // (시간 = 거리 / 속력) 이기 때문에 우리가 사용하는 duration 또한 
+        // Vector2.Distance(prevPos, pos) / coinSpeed 로 결정합니다.
+        // 거리는 변경하지 못하므로 coinSpeed 값을 변경해서 떨어지는 속력이 어떻게 달라지는지 확인할 수 있습니다.
+
+        float duration = 0.0f;
+        float coinSpeed = 10.0f;
+
+        Vector2 prevPos = coin.transform.position;
+        coin.State = GameCoin.GameState.Move;
+        duration = Vector2.Distance(prevPos, pos) / coinSpeed;
+
+        coin.transform.DOMove(
+            pos, duration).OnComplete(coin.CoinMoveDone);
     }
 }

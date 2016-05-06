@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using DG.Tweening;
 
 public class GameCoin : MonoBehaviour
 {
@@ -7,7 +8,8 @@ public class GameCoin : MonoBehaviour
     {
         Live,
         Dead,
-        Select
+        Select,
+        Move
     };
     private int _type;
     private GameState _state;
@@ -49,9 +51,10 @@ public class GameCoin : MonoBehaviour
         _type = 0;
         _state = GameState.Live;
     }
-
-    //public void Init()
-    //{
-
-    //}
+    
+    public void CoinMoveDone()
+    {
+        DOTween.Kill(this);
+        _state = GameState.Live;
+    }
 }
