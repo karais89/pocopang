@@ -30,6 +30,18 @@ public class GameCoin : MonoBehaviour
         set { _state = value; }
     }
 
+    public bool IsVisible
+    { 
+        get
+        {
+            return _spriteRenderer.enabled;
+        }
+        set
+        {
+            _spriteRenderer.enabled = value;
+        }
+    }
+
     void Awake()
     {
         _spriteRenderer = GetComponent<SpriteRenderer>();

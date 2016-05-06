@@ -12,9 +12,13 @@ public class GameManager : MonoBehaviour
 
     public GameObject GameCoinPrefab;
     private List<GameCoin> _gameCoins;
-    
+    private TouchSystem _touchSystem;
+
     void Awake()
     {
+        _touchSystem = GetComponent<TouchSystem>();
+        _touchSystem.GameManager = this;
+
         InitGameCoin();
     }
 
@@ -63,5 +67,33 @@ public class GameManager : MonoBehaviour
         gameCoin.State = (GameCoin.GameState)state;
         
         return gameCoin;
+    }
+
+    public int CheckPushGameCoin()
+    {
+        RaycastHit2D hit = Physics2D.Raycast(
+            Camera.main.ScreenToWorldPoint(Input.mousePosition), Vector2.zero);
+
+        if (hit.collider)
+        {
+            //Debug.Log("name : "+ hit.collider.name);
+            GameCoin gameCoin = hit.transform.GetComponent<GameCoin>();
+            if (gameCoin.IsVisible)
+                gameCoin.IsVisible = false;
+            else
+                gameCoin.IsVisible = true;
+
+            // 굳이 gamecoin 인덱스를 넘겨줘야 되나?
+            for(int i = 0; i < _gameCoins.Count; i++)
+            {
+                if(_gameCoins[i] == gameCoin)
+                {
+                    Debug.Log("index : " + i);
+                    return i;
+                }
+            }
+        }
+
+        return -1;
     }
 }
