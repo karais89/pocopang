@@ -67,6 +67,9 @@ public class GameManager : MonoBehaviour
     private int _selectCoinCount;
     private int _lastCoin = -1;
 
+    // 배열에 각 라인의 사라진 코인수 저장.
+    private int[] _lineDeadCoin = new int[kBoardX];
+
     public int LastCoin
     {
         get { return _lastCoin; }
@@ -360,5 +363,55 @@ public class GameManager : MonoBehaviour
 
         coin.transform.DOMove(
             pos, duration).OnComplete(coin.CoinMoveDone);
+    }
+
+    public void AddNewCoin()
+    {
+        for (int i = 0; i < kBoardX; i++)
+            _lineDeadCoin[i] = 0;
+
+        for(int i = 0; i < _gameCoins.Count; i++)
+        {
+            GameCoin coin = _gameCoins[i];
+            if(coin.State == GameCoin.GameState.Dead)
+            {
+                int line = (int)(i / kBoardY);
+                _lineDeadCoin[line] += 1;
+
+                SetNewCoin(coin);
+            }
+        }
+
+        AddNewCoinAction();
+    }
+
+    public void SetNewCoin(GameCoin coin)
+    {
+        int coinType = Random.Range(0, kTotalCoinType);
+        coin.Type = coinType;
+        coin.IsVisible = true;
+        coin.State = GameCoin.GameState.Live;
+    }
+
+    public void AddNewCoinAction()
+    {
+        float diffY = 1.20f;
+
+        for(int i = 0; i < kBoardX; i++)
+        {
+            if(_lineDeadCoin[i] > 0)
+            {
+                int startIndex = i * kBoardY;
+
+                for(int j = startIndex; j < startIndex + _lineDeadCoin[i]; j++)
+                {
+                    GameCoin coin = _gameCoins[j];
+                    Vector2 pos = coin.transform.position;
+                    coin.transform.position = new Vector2(pos.x, pos.y + (_lineDeadCoin[i] * diffY));
+
+                    MoveCoin(coin, pos);
+                }
+            }
+        }
     }
 }
