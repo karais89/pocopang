@@ -63,6 +63,14 @@ public class GameManager : MonoBehaviour
     private List<GameObject> _selectMasks;
     private List<GameCoin> _selectCoins;
     private TouchSystem _touchSystem;
+    private int _selectCoinCount;
+    private int _lastCoin = -1;
+
+    public int LastCoin
+    {
+        get { return _lastCoin; }
+        set { _lastCoin = value; }
+    }
 
     void Awake()
     {
@@ -84,7 +92,8 @@ public class GameManager : MonoBehaviour
         _gameCoins = new List<GameCoin>();
         _selectMasks = new List<GameObject>();
         _selectCoins = new List<GameCoin>();
-
+        _selectCoinCount = 0;
+        
         for(int xIndex = 0; xIndex < kBoardX; xIndex++)
         {
             coinXPos = initCoinXPos + (xIndex * diffX);
@@ -170,9 +179,9 @@ public class GameManager : MonoBehaviour
         return -1;
     }
 
-    public int CheckAdjacentCoin(int lastCoin)
+    public int CheckAdjacentCoin()
     {
-        if (lastCoin < 0)
+        if (_lastCoin < 0)
             return -1;
 
         RaycastHit2D hit = Physics2D.Raycast(
@@ -183,25 +192,25 @@ public class GameManager : MonoBehaviour
         { 
             for (int index = 0; index < _adjCoin.GetLength(1); index++)
             {
-                if (_adjCoin[lastCoin ,index] == -1)
+                if (_adjCoin[_lastCoin ,index] == -1)
                     continue;
 
-                GameCoin tmpCoin = _gameCoins[_adjCoin[lastCoin, index]];
+                GameCoin tmpCoin = _gameCoins[_adjCoin[_lastCoin, index]];
 
                 if (hit.collider.gameObject == tmpCoin.gameObject)
-                    return _adjCoin[lastCoin, index];
+                    return _adjCoin[_lastCoin, index];
             }
         }
 
         return -1;
     }
 
-    public bool InLastCoin(int lastCoin)
+    public bool InLastCoin()
     {
-        if (lastCoin == -1)
+        if (_lastCoin == -1)
             return false;
 
-        GameCoin gameCoin = _gameCoins[lastCoin];
+        GameCoin gameCoin = _gameCoins[_lastCoin];
         RaycastHit2D hit = Physics2D.Raycast(
             Camera.main.ScreenToWorldPoint(Input.mousePosition), 
             Vector2.zero);
@@ -227,6 +236,8 @@ public class GameManager : MonoBehaviour
             selectMask.SetActive(true);
         }
 
+        _selectCoinCount += 1;
+
         return 0;
     }
 
@@ -236,5 +247,45 @@ public class GameManager : MonoBehaviour
             return false;
         
         return _gameCoins[index1].Type == _gameCoins[index2].Type;
+    }
+
+    public void ClearSelectCoin()
+    {
+        if(_selectCoinCount >= 3)
+        {
+            for(int index = 0; index < _selectCoins.Count; index++)
+            {
+                GameCoin tmpCoin = _selectCoins[index];
+                tmpCoin.State = GameCoin.GameState.Dead;
+                tmpCoin.IsVisible = false;
+            }
+        }
+        else
+        {
+            for (int index = 0; index < _selectCoins.Count; index++)
+            {
+                GameCoin tmpCoin = _selectCoins[index];
+                tmpCoin.State = GameCoin.GameState.Live;
+            }
+        }
+
+        ResetSelectMask();
+        ResetGameInfo();
+    }
+
+    public void ResetSelectMask()
+    {
+        for (int i = 0; i < _selectMasks.Count; i++)
+        {
+            GameObject selectMask = _selectMasks[i];
+            selectMask.SetActive(false);
+        }
+    }
+
+    public void ResetGameInfo()
+    {
+        _selectCoinCount = 0;
+        
+        _selectCoins.Clear();
     }
 }
