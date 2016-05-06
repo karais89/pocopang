@@ -518,6 +518,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   GameCoinPrefab: {fileID: 160006, guid: 4348e7b496e06c847aecef4c5d9c6678, type: 2}
+  SelectMaskPrefab: {fileID: 160658, guid: 7afb85ddb20d0a243b894399c354d7d5, type: 2}
 --- !u!4 &1800774525
 Transform:
   m_ObjectHideFlags: 0

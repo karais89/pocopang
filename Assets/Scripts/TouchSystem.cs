@@ -17,6 +17,8 @@ public class TouchSystem : MonoBehaviour
         }
     }
 
+    private int _lastCoin = -1;
+
 	// Update is called once per frame
 	void Update ()
     {
@@ -38,12 +40,26 @@ public class TouchSystem : MonoBehaviour
     {
         //Debug.Log("TouchBegan");]
         //CheckPushGameCoin();
-        _gameManager.CheckPushGameCoin();
+        _lastCoin = _gameManager.CheckPushGameCoin();
+        if (_lastCoin >= 0)
+            GameManager.AddSelectCoins(_lastCoin);
     }
 
     private void TouchMoved()
     {
         //Debug.Log("TouchMoved");
+        int newCoin = -1;
+
+        if(!GameManager.InLastCoin(_lastCoin))
+        {
+            newCoin = GameManager.CheckAdjacentCoin(_lastCoin);
+
+            if(GameManager.CompareCoinType(_lastCoin, newCoin))
+            {
+                _lastCoin = newCoin;
+                _gameManager.AddSelectCoins(_lastCoin);
+            }
+        }
     }
 
     private void TouchEnded()
