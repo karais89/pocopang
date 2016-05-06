@@ -288,4 +288,55 @@ public class GameManager : MonoBehaviour
         
         _selectCoins.Clear();
     }
+    /*
+        (선택된 코인 = 없어질 코인)
+        1. 맨밑부터 시작
+        2. 현재 coin이 선택된 것이면 아무것도 안함
+        3. 선택되지 않았다면
+         - 자신의 아래에 선택된 coin 갯수를 파악
+         - 갯수만큼 아래의 coin과 위치 변경
+         (예) 내 밑에 두개면 두개 밑이랑 나랑 교체
+    */
+    public void MoveUpDeadCoin()
+    {
+        for(int x = 0; x < kBoardX; x++)
+        {
+            // 현재 라인의 제일 밑의 Position - 첫 번째 줄의 bottomPos = ((0 + 1) * 6) - 1 = 5 -두 번째 줄의 bottomPos = ((1 + 1) * 6) - 1 = 11
+            int bottomPos = ((x + 1) * kBoardY) - 1;
+
+            // 내 밑의 dead 상태의 코인 수
+            int deadCoinNum = 0;
+
+            // 현재 코인이 DEAD 상태이면 deadCountNum을 '1' 증가시키고 끝! 다음꺼.
+            // 내 밑에 DEAD 상태의 코인이 1개 이상이면, 나와 그 위치의 코인을 changeCoin()으로 변경
+            for (int y = bottomPos; y > bottomPos - kBoardY; y--)
+            {
+                GameCoin coin = _gameCoins[y];
+                if (coin.State == GameCoin.GameState.Dead)
+                {
+                    deadCoinNum++;
+                    continue;
+                }
+
+                if (deadCoinNum > 0)
+                    ChangeCoin(y, y + deadCoinNum);
+            }
+        }     
+    }
+
+    public void ChangeCoin(int index1, int index2)
+    {
+        GameCoin tmpCoin1 = _gameCoins[index1];
+        GameCoin tmpCoin2 = _gameCoins[index2];
+
+        // pos swap
+        Vector2 tmpPos = tmpCoin2.transform.position;
+        tmpCoin2.transform.position = tmpCoin1.transform.position;
+        tmpCoin1.transform.position = tmpPos;
+
+        // array swap
+        GameCoin tmpCoin = _gameCoins[index1];
+        _gameCoins[index1] = _gameCoins[index2];
+        _gameCoins[index2] = tmpCoin;
+    }
 }

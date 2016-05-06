@@ -64,5 +64,6 @@ public class TouchSystem : MonoBehaviour
     {
         //Debug.Log("TouchEnded");
         _gameManager.ClearSelectCoin();
+        _gameManager.MoveUpDeadCoin();
     }
  }
